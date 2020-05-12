@@ -15,6 +15,7 @@ public:
     bool    execContinue();
     bool    showLocals(bool bWithValues = true);
         
+    bool    executeCommand(const std::string & command, std::string & result);
 
 
 private:
@@ -22,6 +23,7 @@ private:
     int _getReadFd() const;
     int _getGdbWriteFd() const;
     int _getGdbReadFd() const;
+
 
     bool    _readTillPostAmble(std::string & readValue);
     bool    _writeCommand(const std::string & command);

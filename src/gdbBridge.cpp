@@ -5,6 +5,7 @@
 #include <string>
 #include "unistd.h"
 #include <cstring>
+#include "gdbCommand.h"
 
 GdbBridge::GdbBridge() : _gdbStarted(false)
 {
@@ -52,48 +53,40 @@ bool GdbBridge::spawnGdb()
 bool GdbBridge::attachToProcess(int pId)
 {
     if (!_gdbStarted) return false;
-    std::string command = "-target-attach ";
-    command.append(std::to_string(pId));
-    if (!_writeCommand(command)) return false;
-
-    std::string readBuffer;
-    bool ret = _readTillPostAmble(readBuffer);
-  //std::cout << __func__ << ": " << readBuffer << std::endl;
-    return ret;
+    AttachToProcessCmd attchCmd(pId);
+    return attchCmd.execute(*this);
 }
 
 bool GdbBridge::setBreakpoint(const std::string & bpName)
 {
-    if (bpName.empty()) return false;
-    std::string command = "-break-insert ";
-    command.append(bpName);
-    if (!_writeCommand(command)) return false;
-    std::string readBuffer;
-    bool ret = _readTillPostAmble(readBuffer);
-    std::cout << __func__ << ": " << readBuffer << std::endl;
+    SetBreakpointCmd bpCmd(bpName);
+    bool ret = bpCmd.execute(*this);
+    std::string result;
+    bpCmd.getResult(result);
+    std::cout << "result: " << result << std::endl;
     return ret;
 }
 
 bool GdbBridge::execContinue()
 {
-    std::string command = "-exec-continue";
-    if (!_writeCommand(command)) return false;
-    std::string readBuffer;
-    bool ret = _readTillPostAmble(readBuffer);
-    std::cout << __func__ << ": " << readBuffer << std::endl;
-    return ret;
+    ExecContinueCmd contCmd;
+    return contCmd.execute(*this);
 }
 
 bool GdbBridge::showLocals(bool bWithValues)
 {
-    std::string command = "-stack-list-locals ";
-    command.append(bWithValues ? "1" : "0");
+    ShowLocalsCmd localsCmd(bWithValues);
+    return localsCmd.execute(*this);
+}
+
+bool GdbBridge::executeCommand(const std::string & command, std::string & result)
+{
     if (!_writeCommand(command)) return false;
-    std::string readBuffer;
-    bool ret = _readTillPostAmble(readBuffer);
-    std::cout << __func__ << ": " << readBuffer << std::endl;
+
+    bool ret = _readTillPostAmble(result);
     return ret;
 }
+
 
 bool GdbBridge::_writeCommand(const std::string & command)
 {
