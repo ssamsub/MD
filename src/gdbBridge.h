@@ -14,6 +14,7 @@ public:
     bool    setBreakpoint(const std::string & bpName);
     bool    execContinue();
     bool    showLocals(bool bWithValues = true);
+    bool    flush();    // remove anything left from read buffer
         
     bool    executeCommand(const std::string & command, std::string & result);
 

@@ -63,7 +63,7 @@ bool GdbBridge::setBreakpoint(const std::string & bpName)
     bool ret = bpCmd.execute(*this);
     std::string result;
     bpCmd.getResult(result);
-    std::cout << "result: " << result << std::endl;
+  //std::cout << "result: " << result << std::endl;
     return ret;
 }
 
@@ -76,7 +76,17 @@ bool GdbBridge::execContinue()
 bool GdbBridge::showLocals(bool bWithValues)
 {
     ShowLocalsCmd localsCmd(bWithValues);
-    return localsCmd.execute(*this);
+    bool ret = localsCmd.execute(*this);
+    std::string result;
+    localsCmd.getResult(result);
+    std::cout << "result: " << result << std::endl;
+    return ret;
+}
+
+bool GdbBridge::flush()    // remove anything left from read buffer
+{
+    std::string result;
+    return _readTillPostAmble(result);
 }
 
 bool GdbBridge::executeCommand(const std::string & command, std::string & result)
