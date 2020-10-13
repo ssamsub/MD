@@ -13,6 +13,7 @@ public:
     bool    attachToProcess(int pId);
     bool    setBreakpoint(const std::string & bpName);
     bool    execContinue();
+    bool    pollBreakpointHit();
     bool    showLocals(bool bWithValues = true);
     bool    flush();    // remove anything left from read buffer
         

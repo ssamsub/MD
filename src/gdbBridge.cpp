@@ -63,14 +63,20 @@ bool GdbBridge::setBreakpoint(const std::string & bpName)
     bool ret = bpCmd.execute(*this);
     std::string result;
     bpCmd.getResult(result);
-  //std::cout << "result: " << result << std::endl;
-    return ret;
+    size_t pos = result.find("^done");
+    if (ret && pos != string::npos) return true;
+    std::cout << __func__ << ": " << result << std::endl;
+    return false;
 }
 
 bool GdbBridge::execContinue()
 {
     ExecContinueCmd contCmd;
-    return contCmd.execute(*this);
+    bool bRet = contCmd.execute(*this);
+    std::string result;
+    contCmd.getResult(result);
+    std::cout << __func__ << ": result: " << result << std::endl;
+    return bRet;
 }
 
 bool GdbBridge::showLocals(bool bWithValues)
@@ -86,7 +92,19 @@ bool GdbBridge::showLocals(bool bWithValues)
 bool GdbBridge::flush()    // remove anything left from read buffer
 {
     std::string result;
-    return _readTillPostAmble(result);
+    bool ret = _readTillPostAmble(result);
+    std::cout << "fulshing: " << result << std::endl;
+    return ret;
+}
+
+bool GdbBridge::pollBreakpointHit()
+{
+    std::string result;
+    bool ret = _readTillPostAmble(result);
+    if (!ret) return false;
+
+    size_t pos = result.find("*stopped,reason=\"breakpoint-hit\"");
+    return (pos != string::npos);
 }
 
 bool GdbBridge::executeCommand(const std::string & command, std::string & result)
