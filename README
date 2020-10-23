@@ -1,0 +1,5 @@
+#Compiler
+Compiler: /depot/gcc-7.3.0/bin/g++ src/*.cpp -std=c++11
+
+Linker (ld)
+set path = (/depot/binutils-2.30/bin $path)
